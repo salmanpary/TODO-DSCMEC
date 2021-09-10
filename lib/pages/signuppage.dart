@@ -3,6 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:todo/pages/homepage.dart';
 import 'package:todo/pages/signinpage.dart';
+import 'package:todo/service/Auth_service.dart';
+import 'package:todo/pages/phoneauth.dart';
 
 class Signuppage extends StatefulWidget {
   @override
@@ -14,6 +16,7 @@ class _SignuppageState extends State<Signuppage> {
   TextEditingController emailcontroller = TextEditingController();
   TextEditingController passwordcontroller = TextEditingController();
   bool circular = false;
+  Authclass authclass=Authclass();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,9 +39,13 @@ class _SignuppageState extends State<Signuppage> {
               SizedBox(
                 height: 20,
               ),
-              buttonitem("assets/google.svg", "continue with google", 25),
+              buttonitem("assets/google.svg", "continue with google", 25,()async{
+                await authclass.googlesignin(context);
+              }),
               buttonitem(
-                  "assets/phone-call-icon.svg", "continue with phone", 30),
+                  "assets/phone-call-icon.svg", "continue with phone", 30,(){
+                    Navigator.push(context, MaterialPageRoute(builder: (builder)=>PhoneAuthPage()));
+              }),
               SizedBox(
                 height: 15,
               ),
@@ -188,39 +195,42 @@ class _SignuppageState extends State<Signuppage> {
     );
   }
 
-  Widget buttonitem(String imagepath, String buttonname, double size) {
-    return Container(
-      height: 60,
-      width: MediaQuery.of(context).size.width - 60,
-      child: Card(
-        elevation: 8,
-        color: Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-          side: BorderSide(
-            width: 1,
-            color: Colors.grey,
+  Widget buttonitem(String imagepath, String buttonname, double size,Function ontap ) {
+    return InkWell(
+      onTap:ontap,
+      child: Container(
+        height: 60,
+        width: MediaQuery.of(context).size.width - 60,
+        child: Card(
+          elevation: 8,
+          color: Colors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+            side: BorderSide(
+              width: 1,
+              color: Colors.grey,
+            ),
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              imagepath,
-              height: size,
-              width: size,
-            ),
-            SizedBox(
-              width: 15,
-            ),
-            Text(
-              buttonname,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 17,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                imagepath,
+                height: size,
+                width: size,
               ),
-            )
-          ],
+              SizedBox(
+                width: 15,
+              ),
+              Text(
+                buttonname,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 17,
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

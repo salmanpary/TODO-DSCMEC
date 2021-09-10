@@ -3,8 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:todo/pages/homepage.dart';
 import 'package:todo/pages/signuppage.dart';
 import 'package:todo/pages/signinpage.dart';
+import 'package:todo/service/Auth_service.dart';
 
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,30 +22,29 @@ class Myapp extends StatefulWidget {
 }
 
 class _MyappState extends State<Myapp> {
-  firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
-  void signup()async{
-    try {
-      firebase_auth.UserCredential userCredential = await firebase_auth.FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: "barry.allen@example.com",
-          password: "SuperSecretPassword!"
-      );
-    } on firebase_auth.FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
+  Widget currentpage=Signuppage();
+  Authclass authclass=Authclass();
+
 
 
 
   @override
+  void initState(){
+    super.initState();
+    checkLogin();
+  }
+  void checkLogin()async{
+    String token =await authclass.gettoken();
+    if(token!=null){
+      setState(() {
+        currentpage=HomePage();
+      });
+    }
+  }
+
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Signuppage(),
+      home: currentpage,
     );
   }
 }
