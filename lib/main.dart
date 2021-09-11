@@ -7,6 +7,7 @@ import 'package:todo/pages/homepage.dart';
 import 'package:todo/pages/signuppage.dart';
 import 'package:todo/pages/signinpage.dart';
 import 'package:todo/service/Auth_service.dart';
+import 'package:todo/pages/Addtodo.dart';
 
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,7 +45,7 @@ class _MyappState extends State<Myapp> {
 
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: currentpage,
+      home: Addtodopage(),
     );
   }
 }
