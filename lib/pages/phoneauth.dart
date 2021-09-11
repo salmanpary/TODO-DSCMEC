@@ -122,7 +122,7 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
 
   void startTimer() {
     const onsec = Duration(seconds: 1);
-    Timer _timer = Timer.periodic(onsec, (timer) {
+    Timer timer = Timer.periodic(onsec, (timer) {
       if (start == 0) {
         setState(() {
           timer.cancel();
