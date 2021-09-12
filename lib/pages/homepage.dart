@@ -1,16 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:todo/pages/Addtodo.dart';
 import 'package:todo/pages/signuppage.dart';
 import 'package:todo/service/Auth_service.dart';
+import 'package:todo/custom/todocard.dart';
 
 class HomePage extends StatefulWidget {
-
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  Authclass authclass = Authclass();
+  final Stream<QuerySnapshot> _stream =
+      FirebaseFirestore.instance.collection("Todo").snapshots();
 
   @override
   Widget build(BuildContext context) {
@@ -60,8 +64,9 @@ class _HomePageState extends State<HomePage> {
         ),
         BottomNavigationBarItem(
           icon: InkWell(
-            onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (builder)=>Addtodopage()));
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (builder) => Addtodopage()));
             },
             child: Container(
               height: 52,
@@ -92,107 +97,56 @@ class _HomePageState extends State<HomePage> {
           title: Container(),
         ),
       ]),
-      body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          child: Column(
-            children: [
-              Todocard(
-                "wakeupbro",Icons.alarm,Colors.red,"10am",true,Colors.white
-              ),
-              Todocard(
-                  "eat",Icons.emoji_food_beverage,Colors.red,"11am",false,Colors.white
-              ),
-              Todocard(
-                  "sleep",Icons.alarm,Colors.red,"12am",true,Colors.white
-              ),
-              Todocard(
-                  "code",Icons.computer,Colors.red,"1pm",true,Colors.white
-              ),
-              Todocard(
-                  "repeat",Icons.circle,Colors.red,"2pm",true,Colors.white
-              ),
-              SizedBox(height: 10,),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+      body: StreamBuilder(
+          stream: _stream,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Center(child: CircularProgressIndicator());
+            }
+            return ListView.builder(
+                itemCount: snapshot.data.docs.length,
+                itemBuilder: (context, index) {
+                  IconData iconData;
+                  Color iconColor;
 
-  Widget Todocard(String title,IconData icondata,Color iconcolor,String time,bool check,Color iconbgcolor) {
+                  Map<String, dynamic> data =
+                      snapshot.data.docs[index].data() as Map<String, dynamic>;
+                  switch(data["Category"]){
+                    case "Work":
+                      iconData=Icons.run_circle_outlined;
+                      iconColor=Colors.white;
+                      break;
+                    case "run":
+                      iconData=Icons.alarm;
+                      iconColor=Colors.teal;
+                      break;
+                    case "food":
+                      iconData=Icons.emoji_food_beverage;
+                      iconColor=Colors.yellow;
+                      break;
+                    case "programming":
+                      iconData=Icons.airplay_outlined;
+                      iconColor=Colors.blue;
+                      break;
 
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      child: Row(
-        children: [
-          Theme(
-            data: ThemeData(
-              primarySwatch: Colors.blue,
-              unselectedWidgetColor: Color(0xff5e616a),
-            ),
-            child: Transform.scale(
-              scale: 1.5,
-              child: Checkbox(
-                onChanged: (bool value) {},
 
-                activeColor: Color(0xff6cf8a9),
-                checkColor: Color(0xff0e3e26),
-                value: check,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              height: 75,
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                color: Color(0xff2a2e3d),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 15,
-                    ),
-                    Container(
-                      height: 33,
-                      width: 36,
-                      decoration: BoxDecoration(
-                        color: iconbgcolor,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(icondata,color:iconcolor,),
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
-                      ),
-                    ),
-                    Text(time,style: TextStyle(
-                        fontSize: 15,
-                        letterSpacing: 1,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white),),
-                    SizedBox(
-                      width: 20,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+
+                    default:
+                      iconData=Icons.run_circle_outlined;
+                      iconColor=Colors.yellow;
+                  }
+
+
+                  return TodoCard(
+                    title: data["title"]==null?"hey there":data["title"],
+                    check: true,
+                    iconbgcolor: Colors.white,
+                    iconcolor: iconColor,
+                    icondata: iconData,
+                    time: "10am",
+                  );
+                });
+          }),
     );
   }
 }
