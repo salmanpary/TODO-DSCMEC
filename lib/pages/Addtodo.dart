@@ -1,12 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:todo/pages/homepage.dart';
 class Addtodopage extends StatefulWidget {
   @override
   _AddtodopageState createState() => _AddtodopageState();
 }
 
 class _AddtodopageState extends State<Addtodopage> {
+  TextEditingController _titlecontroller=TextEditingController();
+  TextEditingController _descriptioncontroller=TextEditingController();
+  String type="";
+  String category="";
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,6 +69,8 @@ class _AddtodopageState extends State<Addtodopage> {
                     height: 25,
                   ),
                   label("task title"),
+                  title(),
+
                   SizedBox(
                     height: 30,
                   ),
@@ -70,11 +80,11 @@ class _AddtodopageState extends State<Addtodopage> {
                   ),
                   Row(
                     children: [
-                      chipdata("important", 0xffff6d6e),
+                      taskselect("important", 0xffff6d6e),
                       SizedBox(
                         width: 20,
                       ),
-                      chipdata("planned", 0xffff6d6e),
+                      taskselect("planned", 0xffff6d6e),
                     ],
                   ),
                   SizedBox(
@@ -95,19 +105,19 @@ class _AddtodopageState extends State<Addtodopage> {
                   Wrap(
                     runSpacing: 10,
                     children: [
-                      chipdata("food", 0xffff6d6e),
+                      categoryselect("food", 0xffff6d6e),
                       SizedBox(
                         width: 20,
                       ),
-                      chipdata("programming", 0xfff29732),
+                      categoryselect("programming", 0xfff29732),
                       SizedBox(
                         width: 20,
                       ),
-                      chipdata("work", 0xff6557ff),
+                      categoryselect("work", 0xff6557ff),
                       SizedBox(
                         width: 20,
                       ),
-                      chipdata("run", 0xff2bc8d9),
+                      categoryselect("run", 0xff2bc8d9),
                     ],
                   ),
                   SizedBox(
@@ -127,22 +137,36 @@ class _AddtodopageState extends State<Addtodopage> {
   }
 
   Widget button() {
-    return Container(
-        height: 56,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(colors: [
-            Color(0xff8a32f1),
-            Color(0xffad32f9),
-          ]),
+    return InkWell(
+      onTap: (){
+        FirebaseFirestore.instance.collection("Todo").add(
+          {
+            "title":_titlecontroller.text,
+            "task":type,
+            "Category":category,
+            "description":_descriptioncontroller.text,
+
+          }
+        );
+        Navigator.pop(context);
+      },
+      child: Container(
+          height: 56,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(colors: [
+              Color(0xff8a32f1),
+              Color(0xffad32f9),
+            ]),
+          ),
+        child: Center(
+          child: Text("add todo",style:TextStyle(
+              fontSize: 18,
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              ),),
         ),
-      child: Center(
-        child: Text("add todo",style:TextStyle(
-            fontSize: 18,
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            ),),
       ),
     );
   }
@@ -156,6 +180,7 @@ class _AddtodopageState extends State<Addtodopage> {
         borderRadius: BorderRadius.circular(15),
       ),
       child: TextFormField(
+        controller: _descriptioncontroller,
         style: TextStyle(
           color: Colors.grey,
           fontSize: 17,
@@ -193,7 +218,54 @@ class _AddtodopageState extends State<Addtodopage> {
       labelPadding: EdgeInsets.symmetric(horizontal: 17, vertical: 3.8),
     );
   }
-
+  Widget taskselect(String label, int color) {
+    return InkWell(
+      onTap: (){
+        setState(() {
+          type=label;
+        });
+      },
+      child: Chip(
+        backgroundColor:type==label?Colors.black87: Color(color),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        label: Text(
+          label,
+          style: TextStyle(
+            color:type==label?Colors.black87: Colors.white,
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        labelPadding: EdgeInsets.symmetric(horizontal: 17, vertical: 3.8),
+      ),
+    );
+  }
+  Widget categoryselect(String label, int color) {
+    return InkWell(
+      onTap: (){
+        setState(() {
+          category=label;
+        });
+      },
+      child: Chip(
+        backgroundColor: category==label?Colors.black87: Color(color),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        label: Text(
+          label,
+          style: TextStyle(
+            color:category==label?Colors.black87: Colors.white,
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        labelPadding: EdgeInsets.symmetric(horizontal: 17, vertical: 3.8),
+      ),
+    );
+  }
   Widget title() {
     return Container(
       height: 55,
@@ -203,6 +275,7 @@ class _AddtodopageState extends State<Addtodopage> {
         borderRadius: BorderRadius.circular(15),
       ),
       child: TextFormField(
+        controller: _titlecontroller,
         style: TextStyle(
           color: Colors.grey,
           fontSize: 17,

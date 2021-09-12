@@ -137,9 +137,7 @@ class _HomePageState extends State<HomePage> {
               scale: 1.5,
               child: Checkbox(
                 onChanged: (bool value) {},
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
+
                 activeColor: Color(0xff6cf8a9),
                 checkColor: Color(0xff0e3e26),
                 value: check,
